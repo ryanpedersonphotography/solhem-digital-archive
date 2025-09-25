@@ -4,15 +4,18 @@ import type { PropertyEvent, EventPhoto, EventYear } from '../types';
 const generateFred2025Photos = (): EventPhoto[] => {
   const photos: EventPhoto[] = [];
   
-  // We have 290 photos available (001-290)
-  // Generate all of them
+  // We have 290 photos available with different suffixes:
+  // 001-072: -all.jpg
+  // 073-250: -top.jpg
+  // 251-290: -all.jpg
   for (let i = 1; i <= 290; i++) {
     const num = i.toString().padStart(3, '0');
+    const suffix = (i >= 73 && i <= 250) ? 'top' : 'all';
     
     photos.push({
       id: `fred-2025-${num}`,
-      url: `/events/2025/fred/2025-fred-${num}-all.jpg`,
-      thumbnail: `/events/2025/fred/2025-fred-${num}-all.jpg`,
+      url: `/events/2025/fred/2025-fred-${num}-${suffix}.jpg`,
+      thumbnail: `/events/2025/fred/2025-fred-${num}-${suffix}.jpg`,
       order: i - 1,
     });
   }
