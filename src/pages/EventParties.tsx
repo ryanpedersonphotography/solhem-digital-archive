@@ -1,19 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { eventsData, getAllYears } from '../utils/eventData';
-import EventGallery from '../components/features/EventGallery';
 import RatingManager from '../components/features/RatingManager';
 import TagManager from '../components/features/TagManager';
 import useRatingStore from '../stores/ratingStore';
 import useTagStore from '../stores/tagStore';
 import StarRating from '../components/features/StarRating';
-import type { PropertyEvent } from '../types';
 
 export default function EventParties() {
   const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [selectedProperty, setSelectedProperty] = useState<string>('all');
-  const [selectedEvent, setSelectedEvent] = useState<PropertyEvent | null>(null);
   const [showRatingManager, setShowRatingManager] = useState(false);
   const [showTagManager, setShowTagManager] = useState(false);
   
@@ -144,7 +141,7 @@ export default function EventParties() {
             <div
               key={event.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-              onClick={() => setSelectedEvent(event)}
+              onClick={() => navigate(`/events/${event.id}`)}
             >
               {/* Event Cover Image */}
               <div className="h-48 overflow-hidden">
@@ -237,14 +234,6 @@ export default function EventParties() {
             </div>
           ))}
         </div>
-      )}
-      
-      {/* Event Gallery Modal */}
-      {selectedEvent && (
-        <EventGallery
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
       )}
     </div>
   );

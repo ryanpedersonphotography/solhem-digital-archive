@@ -7,6 +7,7 @@ import PropertyDetail from './pages/PropertyDetail'
 import LayoutDetail from './pages/LayoutDetail'
 import MediaLibrary from './pages/MediaLibrary'
 import EventParties from './pages/EventParties'
+import EventGalleryPage from './pages/EventGalleryPage'
 import PhotoGallery from './pages/PhotoGallery'
 import { useInitializeData } from './hooks/useData'
 
@@ -43,6 +44,7 @@ function App() {
           <Route path="/property/:propertyId" element={<PropertyDetail />} />
           <Route path="/property/:propertyId/layout/:layoutId" element={<LayoutDetail />} />
           <Route path="/events" element={<EventParties />} />
+          <Route path="/events/:eventId" element={<EventGalleryPage />} />
           <Route path="/gallery" element={<PhotoGallery />} />
           <Route path="/media" element={<MediaLibrary />} />
         </Routes>
