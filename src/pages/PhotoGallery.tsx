@@ -4,6 +4,7 @@ import useRatingStore from '../stores/ratingStore';
 import useTagStore, { ALL_TAGS } from '../stores/tagStore';
 import StarRating from '../components/features/StarRating';
 import EventGallery from '../components/features/EventGallery';
+import LazyImage from '../components/ui/LazyImage';
 import type { PropertyEvent } from '../types';
 
 interface PhotoWithMeta {
@@ -266,14 +267,15 @@ export default function PhotoGallery() {
               className="group cursor-pointer"
             >
               <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-                <img
-                  src={photoMeta.photo.thumbnail || photoMeta.photo.url}
+                <LazyImage
+                  src={photoMeta.photo.url}
+                  thumbnailSrc={photoMeta.photo.thumbnail}
                   alt={photoMeta.photo.caption || `Photo ${index + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  className="w-full h-full object-cover transform transition-transform duration-500 ease-out group-hover:scale-110"
                 />
                 
-                {/* Overlay with info */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Overlay with info - improved animation */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
                     {/* Event name */}
                     <div className="text-xs opacity-90 truncate">
@@ -311,11 +313,14 @@ export default function PhotoGallery() {
               onClick={() => handlePhotoClick(photoMeta, index)}
               className="bg-white rounded-lg shadow-md p-4 flex gap-4 cursor-pointer hover:shadow-lg transition-shadow"
             >
-              <img
-                src={photoMeta.photo.thumbnail || photoMeta.photo.url}
-                alt={photoMeta.photo.caption || `Photo ${index + 1}`}
-                className="w-32 h-32 object-cover rounded-lg"
-              />
+              <div className="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
+                <LazyImage
+                  src={photoMeta.photo.url}
+                  thumbnailSrc={photoMeta.photo.thumbnail}
+                  alt={photoMeta.photo.caption || `Photo ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{photoMeta.event.title}</h3>

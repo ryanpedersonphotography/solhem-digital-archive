@@ -6,6 +6,7 @@ import TagManager from '../components/features/TagManager';
 import useRatingStore from '../stores/ratingStore';
 import useTagStore from '../stores/tagStore';
 import StarRating from '../components/features/StarRating';
+import LazyImage from '../components/ui/LazyImage';
 
 export default function EventParties() {
   const navigate = useNavigate();
@@ -144,12 +145,22 @@ export default function EventParties() {
               onClick={() => navigate(`/events/${event.id}`)}
             >
               {/* Event Cover Image */}
-              <div className="h-48 overflow-hidden">
-                <img
-                  src={event.coverPhoto}
-                  alt={event.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
+              <div className="h-48 overflow-hidden bg-gray-100">
+                {event.coverPhoto ? (
+                  <LazyImage
+                    src={event.coverPhoto}
+                    thumbnailSrc={event.coverPhoto}
+                    alt={event.title || 'Event photo'}
+                    className="w-full h-full object-cover transform transition-transform duration-500 ease-out hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                    <svg className="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
               </div>
               
               {/* Event Details */}
