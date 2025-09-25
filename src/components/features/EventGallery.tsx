@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 import type { PropertyEvent } from '../../types';
+import useRatingStore from '../../stores/ratingStore';
+import useTagStore from '../../stores/tagStore';
+import StarRating from './StarRating';
+import TagSelector from './TagSelector';
 
 interface EventGalleryProps {
   event: PropertyEvent;
@@ -9,6 +13,11 @@ interface EventGalleryProps {
 export default function EventGallery({ event, onClose }: EventGalleryProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showRatingPanel] = useState(true);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  
+  const { ratePhoto, getPhotoRating } = useRatingStore();
+  const { tagPhoto, getPhotoTags } = useTagStore();
   
   // Handle keyboard navigation
   useEffect(() => {
@@ -43,6 +52,30 @@ export default function EventGallery({ event, onClose }: EventGalleryProps) {
   };
   
   const currentPhoto = event.photos[currentPhotoIndex];
+  const currentRating = currentPhoto ? getPhotoRating(currentPhoto.id) : null;
+  const currentPhotoTags = currentPhoto ? getPhotoTags(currentPhoto.id) : null;
+  
+  // Update selected tags when photo changes
+  useEffect(() => {
+    if (currentPhotoTags) {
+      setSelectedTags(currentPhotoTags.tags);
+    } else {
+      setSelectedTags([]);
+    }
+  }, [currentPhotoIndex, currentPhotoTags]);
+  
+  const handleRate = (rating: number) => {
+    if (currentPhoto) {
+      ratePhoto(currentPhoto.id, event.id, rating);
+    }
+  };
+  
+  const handleTagsChange = (tags: string[]) => {
+    setSelectedTags(tags);
+    if (currentPhoto) {
+      tagPhoto(currentPhoto.id, event.id, tags);
+    }
+  };
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
@@ -97,16 +130,57 @@ export default function EventGallery({ event, onClose }: EventGalleryProps) {
       
       {/* Main Gallery Area */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Main Image */}
-        <div className="h-full flex items-center justify-center p-4">
-          {currentPhoto && (
-            <img
-              src={currentPhoto.url}
-              alt={currentPhoto.caption || `Photo ${currentPhotoIndex + 1}`}
-              className={`max-w-full max-h-full object-contain ${
-                isFullscreen ? 'w-full h-full' : ''
-              }`}
-            />
+        <div className="h-full flex">
+          {/* Main Image */}
+          <div className="flex-1 flex items-center justify-center p-4">
+            {currentPhoto && (
+              <img
+                src={currentPhoto.url}
+                alt={currentPhoto.caption || `Photo ${currentPhotoIndex + 1}`}
+                className={`max-w-full max-h-full object-contain ${
+                  isFullscreen ? 'w-full h-full' : ''
+                }`}
+              />
+            )}
+          </div>
+          
+          {/* Rating and Tagging Panel - Right Side */}
+          {showRatingPanel && !isFullscreen && currentPhoto && (
+            <div className="w-80 bg-black bg-opacity-50 p-6 flex flex-col justify-start pt-12 overflow-y-auto">
+              {/* Rating Section */}
+              <div className="bg-black bg-opacity-75 text-white p-6 rounded-lg mb-4">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="text-lg font-semibold">Rate this photo</div>
+                  <StarRating
+                    rating={currentRating?.rating || 0}
+                    onRate={handleRate}
+                    size="lg"
+                  />
+                  {currentRating ? (
+                    <div className="text-sm opacity-90 text-center">
+                      You rated this {currentRating.rating} star{currentRating.rating !== 1 ? 's' : ''}
+                    </div>
+                  ) : (
+                    <div className="text-sm opacity-60 text-center">
+                      Click to rate
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Tagging Section */}
+              <div className="bg-black bg-opacity-75 text-white p-6 rounded-lg">
+                <div className="mb-4">
+                  <div className="text-lg font-semibold mb-1">Tag this photo</div>
+                  <div className="text-xs opacity-60">Select categories that describe this photo</div>
+                </div>
+                <TagSelector
+                  selectedTags={selectedTags}
+                  onTagsChange={handleTagsChange}
+                  size="sm"
+                />
+              </div>
+            </div>
           )}
         </div>
         
