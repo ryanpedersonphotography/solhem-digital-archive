@@ -14,7 +14,7 @@ import type {
 // Helper functions
 const randomElement = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
 const randomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
-const randomFloat = (min: number, max: number): number => Math.random() * (max - min) + min;
+// const randomFloat = (min: number, max: number): number => Math.random() * (max - min) + min;
 
 // Generate image URLs
 const generateImageUrl = (type: string, seed: string, width = 800, height = 600): string => {
@@ -42,6 +42,8 @@ const generateMediaAsset = (type: string, propertyId: string, index: number): Me
     description: `${type} image for property`,
     tags: [type],
     uploadedAt: new Date(),
+    uploadedBy: 'system',
+    size: 1024000,
     metadata: {
       width: 800,
       height: 600,
@@ -73,9 +75,23 @@ const generateLayout = (propertyId: string, type: UnitType, index: number): Layo
     squareFeet: sqft,
     bedrooms: type === 'studio' ? 0 : parseInt(type.charAt(0)) || 2,
     bathrooms: type === 'studio' ? 1 : type === '1br' ? 1 : 2,
-    floorPlanUrl: generateImageUrl('floorplan', `${propertyId}-${type}-${index}`, 1200, 900),
+    floorPlan: {
+      id: `${propertyId}-floorplan-${type}-${index}`,
+      url: generateImageUrl('floorplan', `${propertyId}-${type}-${index}`, 1200, 900),
+      type: 'image',
+      title: `Floor Plan ${type.toUpperCase()}`,
+      tags: ['floorplan'],
+      uploadedAt: new Date(),
+      uploadedBy: 'system',
+      size: 2048000,
+      metadata: {},
+    },
+    marketingImages: [],
+    baseRent: 0,
+    availableUnits: 0,
+    totalUnits: 0,
     description: `Modern ${type} layout with open concept design`,
-    virtualTourUrl: `https://my.matterport.com/show/?m=example${index}`,
+    virtual3DTour: `https://my.matterport.com/show/?m=example${index}`,
     features: [],
   };
 };
@@ -148,10 +164,8 @@ const generateUnit = (propertyId: string, unitNumber: number, propertyName: stri
     maintenanceRequests: [],
     amenities: [],
     images: Array.from({ length: randomInt(3, 6) }, (_, i) => generateMediaAsset('unit', id, i)),
-    availableDate: status === 'available' ? new Date() : null,
+    availableDate: status === 'available' ? new Date() : undefined,
     lastRenovation: new Date(2022, randomInt(0, 11), randomInt(1, 28)),
-    createdAt: new Date(2021, randomInt(0, 11), randomInt(1, 28)),
-    updatedAt: new Date(),
     metadata: {},
   };
 };
@@ -163,23 +177,23 @@ export const generateSolhemProperties = (): Property[] => {
   // The Archive North Loop
   const archiveId = uuidv4();
   const archiveFeatures: BuildingFeature[] = [
-    { id: '1', name: 'Art Gallery Hallways', description: 'Featuring 100+ commercial artworks', icon: '🎨' },
-    { id: '2', name: 'Rooftop Deck', description: 'Fire-pits, grills, and movie screen', icon: '🏙️' },
-    { id: '3', name: 'Finnish Cedar Sauna', description: 'Authentic Finnish relaxation experience', icon: '🧖' },
-    { id: '4', name: 'Golf Simulator', description: 'State-of-the-art virtual golf experience', icon: '⛳' },
-    { id: '5', name: 'Spin Room', description: 'Private cycling studio', icon: '🚴' },
-    { id: '6', name: 'Underground Parking', description: '3 levels of temperature-controlled parking', icon: '🚗' },
-    { id: '7', name: 'Pet Wash Station', description: 'On-site pet grooming facility', icon: '🐕' },
-    { id: '8', name: 'Bike Storage', description: '300+ secure bike racks', icon: '🚲' },
+    { id: '1', name: 'Art Gallery Hallways', description: 'Featuring 100+ commercial artworks', icon: '🎨', category: 'convenience', images: [] },
+    { id: '2', name: 'Rooftop Deck', description: 'Fire-pits, grills, and movie screen', icon: '🏙️', category: 'convenience', images: [] },
+    { id: '3', name: 'Finnish Cedar Sauna', description: 'Authentic Finnish relaxation experience', icon: '🧖', category: 'convenience', images: [] },
+    { id: '4', name: 'Golf Simulator', description: 'State-of-the-art virtual golf experience', icon: '⛳', category: 'technology', images: [] },
+    { id: '5', name: 'Spin Room', description: 'Private cycling studio', icon: '🚴', category: 'convenience', images: [] },
+    { id: '6', name: 'Underground Parking', description: '3 levels of temperature-controlled parking', icon: '🚗', category: 'convenience', images: [] },
+    { id: '7', name: 'Pet Wash Station', description: 'On-site pet grooming facility', icon: '🐕', category: 'convenience', images: [] },
+    { id: '8', name: 'Bike Storage', description: '300+ secure bike racks', icon: '🚲', category: 'sustainability', images: [] },
   ];
   
   const archiveCommonSpaces: CommonSpace[] = [
-    { id: '1', name: 'Sunlit Library Lounge', type: 'lounge', capacity: 30, description: 'Quiet study and reading area' },
-    { id: '2', name: 'Fitness Center', type: 'fitness', capacity: 50, description: 'State-of-the-art equipment' },
-    { id: '3', name: 'Yoga & Barre Studio', type: 'fitness', capacity: 20, description: 'Dedicated yoga and barre space' },
-    { id: '4', name: "Community Chef's Kitchen", type: 'kitchen', capacity: 15, description: 'Professional-grade cooking space' },
-    { id: '5', name: 'Resident Boardroom', type: 'meeting', capacity: 12, description: 'Professional meeting space' },
-    { id: '6', name: 'Rooftop Dog Run', type: 'outdoor', capacity: 20, description: 'Dedicated pet exercise area' },
+    { id: '1', name: 'Sunlit Library Lounge', type: 'lounge', capacity: 30, description: 'Quiet study and reading area', features: [], images: [], requiresReservation: false },
+    { id: '2', name: 'Fitness Center', type: 'gym', capacity: 50, description: 'State-of-the-art equipment', features: [], images: [], requiresReservation: false },
+    { id: '3', name: 'Yoga & Barre Studio', type: 'gym', capacity: 20, description: 'Dedicated yoga and barre space', features: [], images: [], requiresReservation: true },
+    { id: '4', name: "Community Chef's Kitchen", type: 'other', capacity: 15, description: 'Professional-grade cooking space', features: [], images: [], requiresReservation: true },
+    { id: '5', name: 'Resident Boardroom', type: 'business_center', capacity: 12, description: 'Professional meeting space', features: [], images: [], requiresReservation: true },
+    { id: '6', name: 'Rooftop Dog Run', type: 'rooftop', capacity: 20, description: 'Dedicated pet exercise area', features: [], images: [], requiresReservation: false },
   ];
   
   // Generate layouts for Archive
@@ -253,20 +267,20 @@ export const generateSolhemProperties = (): Property[] => {
   // Lucille Apartments
   const lucilleId = uuidv4();
   const lucilleFeatures: BuildingFeature[] = [
-    { id: '1', name: 'Two-Story Fireside Lounge', description: 'Spacious gathering area with fireplace', icon: '🔥' },
-    { id: '2', name: 'Rooftop Cinema', description: 'Outdoor movie screening area', icon: '🎬' },
-    { id: '3', name: 'Year-Round Finnish Sauna', description: 'Traditional sauna experience', icon: '🧖' },
-    { id: '4', name: 'Home Movie Theatre', description: 'Private screening room', icon: '🎭' },
-    { id: '5', name: 'Work-From-Home Areas', description: 'Dedicated remote work spaces', icon: '💼' },
-    { id: '6', name: 'Pet-Friendly Amenities', description: 'Full pet support services', icon: '🐾' },
+    { id: '1', name: 'Two-Story Fireside Lounge', description: 'Spacious gathering area with fireplace', icon: '🔥', category: 'convenience', images: [] },
+    { id: '2', name: 'Rooftop Cinema', description: 'Outdoor movie screening area', icon: '🎬', category: 'convenience', images: [] },
+    { id: '3', name: 'Year-Round Finnish Sauna', description: 'Traditional sauna experience', icon: '🧖', category: 'convenience', images: [] },
+    { id: '4', name: 'Home Movie Theatre', description: 'Private screening room', icon: '🎭', category: 'convenience', images: [] },
+    { id: '5', name: 'Work-From-Home Areas', description: 'Dedicated remote work spaces', icon: '💼', category: 'technology', images: [] },
+    { id: '6', name: 'Pet-Friendly Amenities', description: 'Full pet support services', icon: '🐾', category: 'convenience', images: [] },
   ];
   
   const lucilleCommonSpaces: CommonSpace[] = [
-    { id: '1', name: 'Fireside Lounge', type: 'lounge', capacity: 40, description: 'Two-story gathering space' },
-    { id: '2', name: 'Gym & Yoga Studio', type: 'fitness', capacity: 30, description: 'Full fitness facilities' },
-    { id: '3', name: 'Rooftop Deck', type: 'outdoor', capacity: 60, description: 'Entertainment and relaxation area' },
-    { id: '4', name: 'Co-Working Space', type: 'meeting', capacity: 25, description: 'Modern work environment' },
-    { id: '5', name: 'Cinema Room', type: 'entertainment', capacity: 20, description: 'Private movie theatre' },
+    { id: '1', name: 'Fireside Lounge', type: 'lounge', capacity: 40, description: 'Two-story gathering space', features: [], images: [], requiresReservation: false },
+    { id: '2', name: 'Gym & Yoga Studio', type: 'gym', capacity: 30, description: 'Full fitness facilities', features: [], images: [], requiresReservation: false },
+    { id: '3', name: 'Rooftop Deck', type: 'rooftop', capacity: 60, description: 'Entertainment and relaxation area', features: [], images: [], requiresReservation: true },
+    { id: '4', name: 'Co-Working Space', type: 'business_center', capacity: 25, description: 'Modern work environment', features: [], images: [], requiresReservation: false },
+    { id: '5', name: 'Cinema Room', type: 'theater', capacity: 20, description: 'Private movie theatre', features: [], images: [], requiresReservation: true },
   ];
   
   // Generate layouts for Lucille
@@ -340,23 +354,23 @@ export const generateSolhemProperties = (): Property[] => {
   // The Fred Edina
   const fredId = uuidv4();
   const fredFeatures: BuildingFeature[] = [
-    { id: '1', name: '25-Yard Lap Pool', description: 'Resort-style swimming pool', icon: '🏊' },
-    { id: '2', name: 'Hot Tub', description: 'Year-round relaxation', icon: '♨️' },
-    { id: '3', name: 'Finnish Sauna', description: 'Authentic sauna experience', icon: '🧖' },
-    { id: '4', name: 'Virtual Reality Golf Simulator', description: 'State-of-the-art golf experience', icon: '⛳' },
-    { id: '5', name: 'Indoor Sport Court', description: 'Multi-purpose athletic facility', icon: '🏀' },
-    { id: '6', name: 'EV Charging Stations', description: 'Electric vehicle support', icon: '🔌' },
-    { id: '7', name: 'Dog Run', description: 'Dedicated pet exercise area', icon: '🐕' },
-    { id: '8', name: 'Stormwater Recycling', description: 'Sustainable water management', icon: '♻️' },
+    { id: '1', name: '25-Yard Lap Pool', description: 'Resort-style swimming pool', icon: '🏊', category: 'convenience', images: [] },
+    { id: '2', name: 'Hot Tub', description: 'Year-round relaxation', icon: '♨️', category: 'convenience', images: [] },
+    { id: '3', name: 'Finnish Sauna', description: 'Authentic sauna experience', icon: '🧖', category: 'convenience', images: [] },
+    { id: '4', name: 'Virtual Reality Golf Simulator', description: 'State-of-the-art golf experience', icon: '⛳', category: 'technology', images: [] },
+    { id: '5', name: 'Indoor Sport Court', description: 'Multi-purpose athletic facility', icon: '🏀', category: 'convenience', images: [] },
+    { id: '6', name: 'EV Charging Stations', description: 'Electric vehicle support', icon: '🔌', category: 'sustainability', images: [] },
+    { id: '7', name: 'Dog Run', description: 'Dedicated pet exercise area', icon: '🐕', category: 'convenience', images: [] },
+    { id: '8', name: 'Stormwater Recycling', description: 'Sustainable water management', icon: '♻️', category: 'sustainability', images: [] },
   ];
   
   const fredCommonSpaces: CommonSpace[] = [
-    { id: '1', name: 'Resort Pool Area', type: 'outdoor', capacity: 100, description: '25-yard lap pool and hot tub' },
-    { id: '2', name: '24/7 Fitness Center', type: 'fitness', capacity: 60, description: 'Comprehensive workout facility' },
-    { id: '3', name: 'Sport Court', type: 'fitness', capacity: 30, description: 'Indoor basketball and sports' },
-    { id: '4', name: 'Pub & Clubhouse', type: 'lounge', capacity: 80, description: 'Social gathering space with bar' },
-    { id: '5', name: 'Rooftop Patios', type: 'outdoor', capacity: 50, description: 'Multiple rooftop spaces with fire pits' },
-    { id: '6', name: 'Private Work Spaces', type: 'meeting', capacity: 40, description: 'Professional work environment' },
+    { id: '1', name: 'Resort Pool Area', type: 'pool', capacity: 100, description: '25-yard lap pool and hot tub', features: [], images: [], requiresReservation: false },
+    { id: '2', name: '24/7 Fitness Center', type: 'gym', capacity: 60, description: 'Comprehensive workout facility', features: [], images: [], requiresReservation: false },
+    { id: '3', name: 'Sport Court', type: 'gym', capacity: 30, description: 'Indoor basketball and sports', features: [], images: [], requiresReservation: true },
+    { id: '4', name: 'Pub & Clubhouse', type: 'lounge', capacity: 80, description: 'Social gathering space with bar', features: [], images: [], requiresReservation: false },
+    { id: '5', name: 'Rooftop Patios', type: 'rooftop', capacity: 50, description: 'Multiple rooftop spaces with fire pits', features: [], images: [], requiresReservation: true },
+    { id: '6', name: 'Private Work Spaces', type: 'business_center', capacity: 40, description: 'Professional work environment', features: [], images: [], requiresReservation: false },
   ];
   
   // Generate layouts for Fred
