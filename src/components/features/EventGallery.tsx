@@ -8,10 +8,11 @@ import TagSelector from './TagSelector';
 interface EventGalleryProps {
   event: PropertyEvent;
   onClose: () => void;
+  initialPhotoIndex?: number;
 }
 
-export default function EventGallery({ event, onClose }: EventGalleryProps) {
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+export default function EventGallery({ event, onClose, initialPhotoIndex = 0 }: EventGalleryProps) {
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(initialPhotoIndex);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showRatingPanel] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);

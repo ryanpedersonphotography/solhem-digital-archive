@@ -25,3 +25,14 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Test files
+test-*.js
+test-*.ts
+
+# Large files and deployment artifacts  
+*.zip
+deploy.html
+netlify-deploy-*.zip
+processed-images/
+fred-processed/

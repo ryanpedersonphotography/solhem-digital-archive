@@ -4,35 +4,18 @@ import type { PropertyEvent, EventPhoto, EventYear } from '../types';
 const generateFred2025Photos = (): EventPhoto[] => {
   const photos: EventPhoto[] = [];
   
-  // Get all available photo filenames (756 total)
-  // We'll select a subset for the gallery
-  const photoNumbers = [
-    '001', '008', '015', '022', '029', '036', '043', '050',
-    '057', '064', '071', '078', '085', '092', '099', '106',
-    '113', '120', '127', '134', '141', '148', '155', '162',
-    '169', '176', '183', '190', '197', '204', '211', '218',
-    '225', '232', '239', '246', '253', '260', '267', '274',
-    '281', '288', '295', '302', '309', '316', '323', '330',
-    '337', '344', '351', '358', '365', '372', '379', '386',
-    '393', '400', '407', '414', '421', '428', '435', '442',
-    '449', '456', '463', '470', '477', '484', '491', '498',
-    '505', '512', '519', '526', '533', '540', '547', '554',
-    '561', '568', '575', '582', '589', '596', '603', '610',
-    '617', '624', '631', '638', '645', '652', '659', '666',
-    '673', '680', '687', '694', '701', '708', '715', '722'
-  ];
-  
-  photoNumbers.forEach((num, index) => {
-    // Determine if it's a "top" or "all" photo based on pattern
-    const suffix = num.match(/^(07[3-9]|08[0-9]|09[0-9]|1[0-4][0-9]|15[0-9]|16[0-5]|17[0-9]|18[0-9]|19[0-9]|2[0-4][0-9]|25[0-9])$/) ? 'top' : 'all';
+  // We have 290 photos available (001-290)
+  // Generate all of them
+  for (let i = 1; i <= 290; i++) {
+    const num = i.toString().padStart(3, '0');
     
     photos.push({
       id: `fred-2025-${num}`,
-      url: `/events/2025/fred/2025-fred-${num}-${suffix}.jpg`,
-      thumbnail: `/events/2025/fred/2025-fred-${num}-${suffix}.jpg`,
-      order: index,
+      url: `/events/2025/fred/2025-fred-${num}-all.jpg`,
+      thumbnail: `/events/2025/fred/2025-fred-${num}-all.jpg`,
+      order: i - 1,
     });
-  });
+  }
   
   return photos;
 };
