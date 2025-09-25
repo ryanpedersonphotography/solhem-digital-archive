@@ -19,6 +19,7 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-8">
             <Link to="/" className={isActive('/')}>Dashboard</Link>
             <Link to="/properties" className={isActive('/properties')}>Properties</Link>
+            <Link to="/events" className={isActive('/events')}>Event Parties</Link>
             <Link to="/media" className={isActive('/media')}>Media</Link>
             <a href="#" className="text-gray-600 hover:text-gray-900">Reports</a>
           </nav>

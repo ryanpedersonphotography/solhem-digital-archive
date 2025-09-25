@@ -1,0 +1,141 @@
+import { useState } from 'react';
+import { eventsData, getAllYears } from '../utils/eventData';
+import EventGallery from '../components/features/EventGallery';
+import type { PropertyEvent } from '../types';
+
+export default function EventParties() {
+  const [selectedYear, setSelectedYear] = useState<number>(2025);
+  const [selectedProperty, setSelectedProperty] = useState<string>('all');
+  const [selectedEvent, setSelectedEvent] = useState<PropertyEvent | null>(null);
+  
+  const years = getAllYears();
+  const properties = [
+    { id: 'all', name: 'All Properties' },
+    { id: 'archive', name: 'The Archive' },
+    { id: 'lucille', name: 'Lucille' },
+    { id: 'fred', name: 'The Fred' },
+  ];
+  
+  // Filter events based on selection
+  const currentYearData = eventsData.find(y => y.year === selectedYear);
+  const filteredEvents = currentYearData?.events.filter(event => 
+    selectedProperty === 'all' || event.propertyId === selectedProperty
+  ) || [];
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-brand-charcoal mb-4">Event Parties</h1>
+        <p className="text-lg text-gray-600">
+          Celebrating community at Solhem properties. Browse our gallery of memorable events and gatherings.
+        </p>
+      </div>
+      
+      {/* Filters */}
+      <div className="flex flex-wrap gap-4 mb-8">
+        {/* Year Filter */}
+        <div className="flex items-center space-x-2">
+          <label className="text-sm font-medium text-gray-700">Year:</label>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            {years.map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+        
+        {/* Property Filter */}
+        <div className="flex items-center space-x-2">
+          <label className="text-sm font-medium text-gray-700">Property:</label>
+          <select
+            value={selectedProperty}
+            onChange={(e) => setSelectedProperty(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            {properties.map(prop => (
+              <option key={prop.id} value={prop.id}>{prop.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      
+      {/* Events Grid */}
+      {filteredEvents.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No events found for the selected criteria.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map(event => (
+            <div
+              key={event.id}
+              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+              onClick={() => setSelectedEvent(event)}
+            >
+              {/* Event Cover Image */}
+              <div className="h-48 overflow-hidden">
+                <img
+                  src={event.coverPhoto}
+                  alt={event.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              
+              {/* Event Details */}
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-primary-600 uppercase tracking-wider">
+                    {event.propertyName}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(event.date).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}
+                  </span>
+                </div>
+                
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
+                
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {event.description}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    {event.attendees} attendees
+                  </div>
+                  
+                  <div className="flex items-center text-sm text-gray-500">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {event.photos.length} photos
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Event Gallery Modal */}
+      {selectedEvent && (
+        <EventGallery
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+        />
+      )}
+    </div>
+  );
+}

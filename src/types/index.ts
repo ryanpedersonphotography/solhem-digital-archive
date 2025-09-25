@@ -278,6 +278,34 @@ export interface Violation {
 
 export type ViolationType = 'noise' | 'damage' | 'late_payment' | 'unauthorized_occupant' | 'pet_violation' | 'other';
 
+// Event Types
+export interface EventPhoto {
+  id: string;
+  url: string;
+  thumbnail?: string;
+  caption?: string;
+  photographer?: string;
+  order: number;
+}
+
+export interface PropertyEvent {
+  id: string;
+  year: number;
+  propertyId: string;
+  propertyName: string;
+  title: string;
+  date: Date;
+  description?: string;
+  photos: EventPhoto[];
+  coverPhoto?: string;
+  attendees?: number;
+}
+
+export interface EventYear {
+  year: number;
+  events: PropertyEvent[];
+}
+
 // Financial Types
 export interface FinancialSummary {
   totalRevenue: number;
