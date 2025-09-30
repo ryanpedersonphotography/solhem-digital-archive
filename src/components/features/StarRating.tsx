@@ -79,12 +79,6 @@ export default function StarRating({
           ({count})
         </span>
       )}
-      
-      {!readonly && rating > 0 && (
-        <span className="ml-2 text-sm text-gray-600">
-          {rating.toFixed(1)}
-        </span>
-      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import MediaLibrary from './pages/MediaLibrary'
 import EventParties from './pages/EventParties'
 import EventGalleryPage from './pages/EventGalleryPage'
 import PhotoGallery from './pages/PhotoGallery'
+import PublicGallery from './pages/PublicGallery'
 import { useInitializeData } from './hooks/useData'
 
 function App() {
@@ -37,18 +38,26 @@ function App() {
 
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/properties" element={<Properties />} />
-          <Route path="/property/:propertyId" element={<PropertyDetail />} />
-          <Route path="/property/:propertyId/layout/:layoutId" element={<LayoutDetail />} />
-          <Route path="/events" element={<EventParties />} />
-          <Route path="/events/:eventId" element={<EventGalleryPage />} />
-          <Route path="/gallery" element={<PhotoGallery />} />
-          <Route path="/media" element={<MediaLibrary />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Public routes without layout */}
+        <Route path="/public/:eventSlug" element={<PublicGallery />} />
+        
+        {/* Admin routes with layout */}
+        <Route path="*" element={
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/properties" element={<Properties />} />
+              <Route path="/property/:propertyId" element={<PropertyDetail />} />
+              <Route path="/property/:propertyId/layout/:layoutId" element={<LayoutDetail />} />
+              <Route path="/events" element={<EventParties />} />
+              <Route path="/events/:eventId" element={<EventGalleryPage />} />
+              <Route path="/gallery" element={<PhotoGallery />} />
+              <Route path="/media" element={<MediaLibrary />} />
+            </Routes>
+          </Layout>
+        } />
+      </Routes>
     </Router>
   )
 }
