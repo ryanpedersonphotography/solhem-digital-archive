@@ -30,7 +30,7 @@ export default function EventGallery({ event, onClose, initialPhotoIndex = 0 }: 
   const { tagPhoto, getPhotoTags } = useTagStore();
   const { isPhotoHidden, togglePhotoHidden } = useHiddenStore();
   const { isPhotoPublic, togglePhotoPublic } = usePublicStore();
-  const { flagPhoto, isPhotoFlagged, markAsSubmitted, getPhotoFlag } = useFlagStore();
+  const { flagPhoto, isPhotoFlagged, markAsSubmitted } = useFlagStore();
   
   // Handle keyboard navigation
   useEffect(() => {

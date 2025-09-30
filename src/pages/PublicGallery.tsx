@@ -4,7 +4,6 @@ import { eventsData } from '../utils/eventData';
 import usePublicStore from '../stores/publicStore';
 import PublicLightbox from '../components/features/PublicLightbox';
 import LazyImage from '../components/ui/LazyImage';
-import type { EventPhoto } from '../types';
 
 const GALLERY_PASSWORD = 'solhem2025';
 
