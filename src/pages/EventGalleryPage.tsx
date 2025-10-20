@@ -44,7 +44,7 @@ export default function EventGalleryPage() {
   const [bulkEditPublic, setBulkEditPublic] = useState<'no-change' | 'add' | 'remove'>('no-change');
   
   const { getPhotoRating, ratings, ratePhoto } = useRatingStore();
-  const { getPhotoTags, getTagStats, photoTags, tagPhoto } = useTagStore();
+  const { getPhotoTags, photoTags, tagPhoto } = useTagStore();
   const { isPhotoHidden, togglePhotoHidden, hiddenPhotos } = useHiddenStore();
   const { getPublicPhotoCount, togglePhotoPublic, isPhotoPublic } = usePublicStore();
   
@@ -167,8 +167,32 @@ export default function EventGalleryPage() {
     return counts;
   }, [photosWithMeta]);
   
-  // Get event statistics
-  const tagStats = getTagStats(event.id);
+  // Get event statistics - use visible photos only (respects hidden photos in public mode)
+  const tagStats = useMemo(() => {
+    const visiblePhotoIds = photosWithMeta.map(p => p.photo.id);
+    const visibleEventTags = Object.values(photoTags).filter(
+      (tag) => tag.eventId === event.id && visiblePhotoIds.includes(tag.photoId)
+    );
+    
+    const tagCounts: Record<string, number> = {};
+    
+    visibleEventTags.forEach((photoTag) => {
+      photoTag.tags.forEach((tag) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+
+    const popularTags = Object.entries(tagCounts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    return {
+      totalTaggedPhotos: visibleEventTags.length,
+      tagCounts,
+      popularTags,
+    };
+  }, [photosWithMeta, photoTags, event.id]);
   
   const handlePhotoClick = (index: number, photo: EventPhoto) => {
     if (isMultiSelectMode) {
