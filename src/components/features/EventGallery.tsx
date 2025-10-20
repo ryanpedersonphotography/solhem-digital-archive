@@ -12,9 +12,10 @@ interface EventGalleryProps {
   event: PropertyEvent;
   onClose: () => void;
   initialPhotoIndex?: number;
+  isAdminMode?: boolean;
 }
 
-export default function EventGallery({ event, onClose, initialPhotoIndex = 0 }: EventGalleryProps) {
+export default function EventGallery({ event, onClose, initialPhotoIndex = 0, isAdminMode = true }: EventGalleryProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(initialPhotoIndex);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showRatingPanel, setShowRatingPanel] = useState(false);
@@ -305,8 +306,9 @@ export default function EventGallery({ event, onClose, initialPhotoIndex = 0 }: 
                   </div>
                 </div>
                 
-                {/* Hide/Show Section */}
-                <div className="bg-black bg-opacity-50 text-white p-6 rounded-lg mb-4">
+                {/* Hide/Show Section - Admin Only */}
+                {isAdminMode && (
+                  <div className="bg-black bg-opacity-50 text-white p-6 rounded-lg mb-4">
                   <div className="flex flex-col items-center gap-3">
                     <div className="text-lg font-semibold">Photo Visibility</div>
                     <button
@@ -339,7 +341,8 @@ export default function EventGallery({ event, onClose, initialPhotoIndex = 0 }: 
                         : 'Photo is visible in the gallery'}
                     </div>
                   </div>
-                </div>
+                  </div>
+                )}
                 
                 {/* Rating Section */}
                 <div className="bg-black bg-opacity-50 text-white p-6 rounded-lg mb-4">

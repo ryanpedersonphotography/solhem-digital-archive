@@ -21,8 +21,30 @@ export default function PublicLightbox({ event, onClose, initialPhotoIndex = 0 }
   
   const { flagPhoto, isPhotoFlagged, markAsSubmitted } = useFlagStore();
   
-  // Handle keyboard navigation
+  const nextPhoto = () => {
+    setCurrentPhotoIndex((prev) => 
+      prev === event.photos.length - 1 ? 0 : prev + 1
+    );
+  };
+  
+  const prevPhoto = () => {
+    setCurrentPhotoIndex((prev) => 
+      prev === 0 ? event.photos.length - 1 : prev - 1
+    );
+  };
+
+  // Handle scroll lock and keyboard navigation
   useEffect(() => {
+    // Prevent background scrolling
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    
+    // Calculate scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (isFullscreen) {
@@ -38,20 +60,14 @@ export default function PublicLightbox({ event, onClose, initialPhotoIndex = 0 }
     };
     
     window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentPhotoIndex, isFullscreen]);
-  
-  const nextPhoto = () => {
-    setCurrentPhotoIndex((prev) => 
-      prev === event.photos.length - 1 ? 0 : prev + 1
-    );
-  };
-  
-  const prevPhoto = () => {
-    setCurrentPhotoIndex((prev) => 
-      prev === 0 ? event.photos.length - 1 : prev - 1
-    );
-  };
+    
+    // Cleanup: restore original scroll behavior
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isFullscreen]);
   
   const currentPhoto = event.photos[currentPhotoIndex];
   const isCurrentPhotoFlagged = currentPhoto ? isPhotoFlagged(currentPhoto.id) : false;

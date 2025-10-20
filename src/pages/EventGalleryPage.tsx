@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { eventsData } from '../utils/eventData';
 import useRatingStore from '../stores/ratingStore';
 import useTagStore, { ALL_TAGS } from '../stores/tagStore';
@@ -20,6 +20,10 @@ interface PhotoWithMeta {
 export default function EventGalleryPage() {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Check if in admin mode
+  const isAdminMode = searchParams.has('admin');
   
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'default' | 'rating-high' | 'rating-low' | 'most-tagged'>('default');
@@ -71,7 +75,7 @@ export default function EventGalleryPage() {
   
   // Get all photos with metadata
   const photosWithMeta = useMemo(() => {
-    return event.photos.map(photo => {
+    let photos = event.photos.map(photo => {
       const rating = getPhotoRating(photo.id);
       const tags = getPhotoTags(photo.id);
       const isHidden = isPhotoHidden(photo.id);
@@ -83,19 +87,28 @@ export default function EventGalleryPage() {
         isHidden
       } as PhotoWithMeta;
     });
-  }, [event?.photos, getPhotoRating, getPhotoTags, ratings, photoTags, isPhotoHidden, hiddenPhotos]);
+    
+    // In public mode, completely filter out hidden photos
+    if (!isAdminMode) {
+      photos = photos.filter(p => !p.isHidden);
+    }
+    
+    return photos;
+  }, [event?.photos, getPhotoRating, getPhotoTags, ratings, photoTags, isPhotoHidden, hiddenPhotos, isAdminMode]);
   
   // Filter by tags, ratings, and hidden status
   const filteredPhotos = useMemo(() => {
     let filtered = photosWithMeta;
     
-    // Apply hidden filter
-    if (showHidden === 'exclude') {
-      filtered = filtered.filter(p => !p.isHidden);
-    } else if (showHidden === 'only') {
-      filtered = filtered.filter(p => p.isHidden);
+    // Apply hidden filter (only in admin mode)
+    if (isAdminMode) {
+      if (showHidden === 'exclude') {
+        filtered = filtered.filter(p => !p.isHidden);
+      } else if (showHidden === 'only') {
+        filtered = filtered.filter(p => p.isHidden);
+      }
+      // 'include' shows all photos regardless of hidden status
     }
-    // 'include' shows all photos regardless of hidden status
     
     // Apply tag filter
     if (selectedTag !== 'all') {
@@ -354,19 +367,21 @@ export default function EventGalleryPage() {
             </div>
           </div>
           
-          {/* Hidden Photos Filter */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hidden Photos</label>
-            <select
-              value={showHidden}
-              onChange={(e) => setShowHidden(e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="exclude">Exclude Hidden</option>
-              <option value="include">Include Hidden</option>
-              <option value="only">Only Hidden</option>
-            </select>
-          </div>
+          {/* Hidden Photos Filter - Admin Only */}
+          {isAdminMode && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hidden Photos</label>
+              <select
+                value={showHidden}
+                onChange={(e) => setShowHidden(e.target.value as any)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="exclude">Exclude Hidden</option>
+                <option value="include">Include Hidden</option>
+                <option value="only">Only Hidden</option>
+              </select>
+            </div>
+          )}
           
           {/* Sort By */}
           <div>
@@ -558,8 +573,8 @@ export default function EventGalleryPage() {
                 </div>
               )}
               
-              {/* Hide/Unhide Button */}
-              {!isMultiSelectMode && (
+              {/* Hide/Unhide Button - Admin Only */}
+              {isAdminMode && !isMultiSelectMode && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -711,8 +726,8 @@ export default function EventGalleryPage() {
                 )}
               </div>
               
-              {/* Hide/Unhide Button - Only show when not in multi-select mode */}
-              {!isMultiSelectMode && (
+              {/* Hide/Unhide Button - Admin Only */}
+              {isAdminMode && !isMultiSelectMode && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -749,6 +764,7 @@ export default function EventGalleryPage() {
             photos: sortedPhotos.map(p => p.photo)
           }}
           initialPhotoIndex={selectedPhotoIndex}
+          isAdminMode={isAdminMode}
           onClose={() => {
             setShowLightbox(false);
             setSelectedPhotoIndex(0);
