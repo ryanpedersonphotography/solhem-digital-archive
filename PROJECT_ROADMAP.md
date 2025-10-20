@@ -522,4 +522,80 @@ npm run dev
 
 ---
 
+## 🎉 Recent Achievements (October 2025)
+
+### ✅ Download All Photos Feature (Completed)
+**Implementation Date**: October 20, 2025
+
+#### What was delivered:
+- **Download All Photos button** in main gallery pages showing filtered photo count
+- **Lightbox download functionality** with real-time progress indicator  
+- **Smart filtering integration** - downloads only visible/filtered photos
+- **JSZip integration** for client-side zip file creation
+- **Progress tracking** with current/total count display
+- **Error handling** with graceful fallbacks for failed downloads
+
+#### Technical details:
+- Added JSZip dependency for browser-based zip creation
+- Enhanced EventGallery component with download state management
+- Added filteredPhotos prop to pass current filter context
+- Implemented async download with progress callbacks
+- Generated sanitized filenames based on event titles
+- Downloads respect admin/public mode visibility rules
+
+#### User experience:
+- Dynamic button text shows exact count: "Download All Photos Below (47)"
+- Progress indicator in lightbox: "Downloading... 23/47"
+- Works with all filters: tags, ratings, hidden photos, search terms
+- Graceful error handling with user-friendly messages
+
+---
+
+### ✅ Filter Statistics Fix (Completed)
+**Implementation Date**: October 20, 2025
+
+#### Problem solved:
+- **Before**: Users in public mode saw "kids (23)" in filter tags but only 15 photos displayed
+- **After**: Users see "kids (15)" and get exactly 15 photos when clicking
+- **Root cause**: Tag statistics included hidden photos but display excluded them
+
+#### Technical implementation:
+- Replaced global `getTagStats(event.id)` with local calculation
+- Used `photosWithMeta` (already filtered by visibility) for tag statistics
+- Ensured filter dropdown and popular tags use consistent photo counting
+- Removed unused imports for cleaner code
+
+#### Impact:
+- **Public mode**: Filter counts now match displayed photos exactly
+- **Admin mode**: Unchanged behavior - all photos included in counts
+- **Consistency**: Dropdown filters and popular tags show same accurate numbers
+- **User trust**: No more misleading filter counts
+
+---
+
+### 🔄 Current Status
+
+#### Deployment:
+- **Production URL**: https://solhem-digital-archive.netlify.app
+- **Site correctly linked**: solhem-digital-archive (verified)
+- **Latest commit**: 1088554 - Filter statistics fix
+- **Branch**: main (up to date)
+
+#### Features in production:
+1. ✅ **Admin mode** via `?admin` URL parameter
+2. ✅ **Download All Photos** with filter integration
+3. ✅ **Accurate filter statistics** in public/admin modes
+4. ✅ **Lightbox scroll lock** functionality
+5. ✅ **Archive 2025 event** with 468 photos
+6. ✅ **Lucille 2025 event** with 218 photos
+
+#### Next potential enhancements:
+- [ ] Download progress persistence across page refreshes
+- [ ] Batch download size optimization for large photo sets
+- [ ] Download format options (original/thumbnail quality)
+- [ ] Download history tracking for users
+- [ ] Bulk photo management improvements
+
+---
+
 *This roadmap is optimized for Vite + React development with Netlify deployment.*
