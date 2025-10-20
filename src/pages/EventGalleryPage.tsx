@@ -476,18 +476,80 @@ export default function EventGalleryPage() {
           </div>
         </div>
         
-        {/* Results Summary */}
-        <div className="mt-4 text-sm text-gray-600">
-          Showing {sortedPhotos.length} photos
-          {selectedTag !== 'all' && ` tagged with "${selectedTag}"`}
-          {ratingOperator !== 'any' && (
-            ` (rating ${
-              ratingOperator === 'equal' ? '=' :
-              ratingOperator === 'greater' ? '>' :
-              ratingOperator === 'greater-equal' ? '≥' :
-              ratingOperator === 'less' ? '<' :
-              ratingOperator === 'less-equal' ? '≤' : ''
-            } ${ratingValue})`
+        {/* Results Summary and Download Button */}
+        <div className="mt-4 flex justify-between items-center">
+          <div className="text-sm text-gray-600">
+            Showing {sortedPhotos.length} photos
+            {selectedTag !== 'all' && ` tagged with "${selectedTag}"`}
+            {ratingOperator !== 'any' && (
+              ` (rating ${
+                ratingOperator === 'equal' ? '=' :
+                ratingOperator === 'greater' ? '>' :
+                ratingOperator === 'greater-equal' ? '≥' :
+                ratingOperator === 'less' ? '<' :
+                ratingOperator === 'less-equal' ? '≤' : ''
+              } ${ratingValue})`
+            )}
+          </div>
+          
+          {/* Download All Photos Button */}
+          {sortedPhotos.length > 0 && (
+            <button
+              onClick={() => {
+                // Use the same download logic from EventGallery component
+                const handleDownloadAll = async () => {
+                  const photosToDownload = sortedPhotos.map(p => p.photo);
+                  
+                  if (photosToDownload.length === 0) {
+                    alert('No photos to download');
+                    return;
+                  }
+
+                  try {
+                    const JSZip = (await import('jszip')).default;
+                    const zip = new JSZip();
+                    
+                    for (let i = 0; i < photosToDownload.length; i++) {
+                      const photo = photosToDownload[i];
+                      
+                      try {
+                        const response = await fetch(photo.url);
+                        if (!response.ok) continue;
+                        
+                        const blob = await response.blob();
+                        const urlParts = photo.url.split('/');
+                        const filename = urlParts[urlParts.length - 1] || `photo-${i + 1}.jpg`;
+                        zip.file(filename, blob);
+                      } catch (error) {
+                        console.warn(`Error downloading ${photo.url}:`, error);
+                      }
+                    }
+
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    const url = URL.createObjectURL(zipBlob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${event.title.replace(/[^a-zA-Z0-9]/g, '_')}_photos.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  } catch (error) {
+                    console.error('Error creating zip file:', error);
+                    alert('Error downloading photos. Please try again.');
+                  }
+                };
+                handleDownloadAll();
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Download All Photos Below ({sortedPhotos.length})</span>
+            </button>
           )}
         </div>
         
@@ -763,6 +825,7 @@ export default function EventGalleryPage() {
             ...event,
             photos: sortedPhotos.map(p => p.photo)
           }}
+          filteredPhotos={sortedPhotos}
           initialPhotoIndex={selectedPhotoIndex}
           isAdminMode={isAdminMode}
           onClose={() => {

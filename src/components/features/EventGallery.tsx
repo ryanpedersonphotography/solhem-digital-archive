@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import JSZip from 'jszip';
 import type { PropertyEvent } from '../../types';
 import useRatingStore from '../../stores/ratingStore';
 import useTagStore from '../../stores/tagStore';
@@ -13,9 +14,10 @@ interface EventGalleryProps {
   onClose: () => void;
   initialPhotoIndex?: number;
   isAdminMode?: boolean;
+  filteredPhotos?: any[];
 }
 
-export default function EventGallery({ event, onClose, initialPhotoIndex = 0, isAdminMode = true }: EventGalleryProps) {
+export default function EventGallery({ event, onClose, initialPhotoIndex = 0, isAdminMode = true, filteredPhotos }: EventGalleryProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(initialPhotoIndex);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showRatingPanel, setShowRatingPanel] = useState(false);
@@ -26,6 +28,11 @@ export default function EventGallery({ event, onClose, initialPhotoIndex = 0, is
   const [flagEmail, setFlagEmail] = useState('');
   const [flagName, setFlagName] = useState('');
   const [flagSubmitStatus, setFlagSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [downloadProgress, setDownloadProgress] = useState<{ current: number; total: number; isDownloading: boolean }>({
+    current: 0,
+    total: 0,
+    isDownloading: false
+  });
   
   const { ratePhoto, getPhotoRating } = useRatingStore();
   const { tagPhoto, getPhotoTags } = useTagStore();
@@ -170,6 +177,66 @@ export default function EventGallery({ event, onClose, initialPhotoIndex = 0, is
       setFlagSubmitStatus('error');
     }
   };
+
+  const handleDownloadAll = async () => {
+    // Use filtered photos if available, otherwise use all event photos
+    const photosToDownload = filteredPhotos ? filteredPhotos.map(p => p.photo) : event.photos;
+    
+    if (photosToDownload.length === 0) {
+      alert('No photos to download');
+      return;
+    }
+
+    setDownloadProgress({ current: 0, total: photosToDownload.length, isDownloading: true });
+
+    try {
+      const zip = new JSZip();
+      
+      for (let i = 0; i < photosToDownload.length; i++) {
+        const photo = photosToDownload[i];
+        setDownloadProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        try {
+          // Fetch the image as a blob
+          const response = await fetch(photo.url);
+          if (!response.ok) {
+            console.warn(`Failed to fetch ${photo.url}`);
+            continue;
+          }
+          
+          const blob = await response.blob();
+          
+          // Extract filename from URL or generate one
+          const urlParts = photo.url.split('/');
+          const filename = urlParts[urlParts.length - 1] || `photo-${i + 1}.jpg`;
+          
+          // Add to zip
+          zip.file(filename, blob);
+        } catch (error) {
+          console.warn(`Error downloading ${photo.url}:`, error);
+        }
+      }
+
+      // Generate and download the zip file
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${event.title.replace(/[^a-zA-Z0-9]/g, '_')}_photos.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error creating zip file:', error);
+      alert('Error downloading photos. Please try again.');
+    } finally {
+      setDownloadProgress({ current: 0, total: 0, isDownloading: false });
+    }
+  };
   
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex flex-col">
@@ -197,6 +264,36 @@ export default function EventGallery({ event, onClose, initialPhotoIndex = 0, is
           </div>
           
           <div className="flex items-center space-x-4">
+            {/* Download All Photos Button */}
+            <button
+              onClick={handleDownloadAll}
+              disabled={downloadProgress.isDownloading}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
+                downloadProgress.isDownloading
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+              title={`Download ${filteredPhotos ? filteredPhotos.length : event.photos.length} photos as ZIP`}
+            >
+              {downloadProgress.isDownloading ? (
+                <>
+                  <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>{downloadProgress.current}/{downloadProgress.total}</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Download All ({filteredPhotos ? filteredPhotos.length : event.photos.length})</span>
+                </>
+              )}
+            </button>
+            
             <span className="text-sm">
               {currentPhotoIndex + 1} / {event.photos.length}
             </span>
