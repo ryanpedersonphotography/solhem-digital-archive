@@ -1,13 +1,8 @@
 // Use dynamic import for ES module
-let Octokit;
+import { Octokit } from '@octokit/rest';
 
 // Initialize GitHub API client
-const getOctokit = async () => {
-  if (!Octokit) {
-    const octokitModule = await import('@octokit/rest');
-    Octokit = octokitModule.Octokit;
-  }
-  
+const getOctokit = () => {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     throw new Error('GITHUB_TOKEN environment variable is required');
@@ -30,7 +25,7 @@ const DATA_FILES = {
   flags: 'data/flagged-photos.json'
 };
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   // Enable CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -44,7 +39,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const octokit = await getOctokit();
+    const octokit = getOctokit();
     const { httpMethod, path, body } = event;
     
     // Parse the data type from the path
