@@ -1,5 +1,11 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-10-28T01:00:00.000Z",
-  "hiddenPhotos": {}
+  "lastUpdated": "2025-10-28T20:48:53.363Z",
+  "hiddenPhotos": {
+    "fred-2025-001": {
+      "photoId": "fred-2025-001",
+      "eventId": "fred-2025",
+      "hiddenAt": "2025-10-28T20:48:53.363Z"
+    }
+  }
 }
