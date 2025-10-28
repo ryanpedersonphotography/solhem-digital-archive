@@ -1,7 +1,13 @@
-const { Octokit } = require('@octokit/rest');
+// Use dynamic import for ES module
+let Octokit;
 
 // Initialize GitHub API client
-const getOctokit = () => {
+const getOctokit = async () => {
+  if (!Octokit) {
+    const octokitModule = await import('@octokit/rest');
+    Octokit = octokitModule.Octokit;
+  }
+  
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     throw new Error('GITHUB_TOKEN environment variable is required');
@@ -38,7 +44,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const octokit = getOctokit();
+    const octokit = await getOctokit();
     const { httpMethod, path, body } = event;
     
     // Parse the data type from the path
