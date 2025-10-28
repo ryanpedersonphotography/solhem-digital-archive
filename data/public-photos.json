@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-10-28T21:37:00.895Z",
+  "lastUpdated": "2025-10-28T21:37:03.377Z",
   "publicPhotos": {
     "fred-2025-002": {
       "photoId": "fred-2025-002",
@@ -11,6 +11,11 @@
       "photoId": "fred-2025-003",
       "eventId": "fred-2025",
       "addedAt": "2025-10-28T21:37:00.619Z"
+    },
+    "fred-2025-004": {
+      "photoId": "fred-2025-004",
+      "eventId": "fred-2025",
+      "addedAt": "2025-10-28T21:37:03.057Z"
     }
   }
 }
