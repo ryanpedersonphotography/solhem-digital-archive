@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { eventsData } from '../utils/eventData';
-import useRatingStore from '../stores/ratingStore';
+import useRatingStore from '../stores/serverRatingStore';
 import useTagStore, { ALL_TAGS } from '../stores/tagStore';
 import useHiddenStore from '../stores/serverHiddenStore';
 import usePublicStore from '../stores/publicStore';

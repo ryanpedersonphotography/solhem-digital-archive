@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import JSZip from 'jszip';
 import type { PropertyEvent } from '../../types';
-import useRatingStore from '../../stores/ratingStore';
+import useRatingStore from '../../stores/serverRatingStore';
 import useTagStore from '../../stores/tagStore';
 import useHiddenStore from '../../stores/serverHiddenStore';
 import usePublicStore from '../../stores/publicStore';

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { eventsData } from '../utils/eventData';
-import useRatingStore from '../stores/ratingStore';
+import useRatingStore from '../stores/serverRatingStore';
 import useTagStore, { ALL_TAGS } from '../stores/tagStore';
 import StarRating from '../components/features/StarRating';
 import EventGallery from '../components/features/EventGallery';

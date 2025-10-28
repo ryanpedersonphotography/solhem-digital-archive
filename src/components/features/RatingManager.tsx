@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useRatingStore from '../../stores/ratingStore';
+import useRatingStore from '../../stores/serverRatingStore';
 import StarRating from './StarRating';
 
 interface RatingManagerProps {

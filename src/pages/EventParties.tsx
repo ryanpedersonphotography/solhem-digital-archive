@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { eventsData, getAllYears } from '../utils/eventData';
 import RatingManager from '../components/features/RatingManager';
 import TagManager from '../components/features/TagManager';
-import useRatingStore from '../stores/ratingStore';
+import useRatingStore from '../stores/serverRatingStore';
 import useTagStore from '../stores/tagStore';
 import StarRating from '../components/features/StarRating';
 import LazyImage from '../components/ui/LazyImage';

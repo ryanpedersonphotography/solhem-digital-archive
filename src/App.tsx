@@ -13,18 +13,29 @@ import PhotoGallery from './pages/PhotoGallery'
 import PublicGallery from './pages/PublicGallery'
 import { useInitializeData } from './hooks/useData'
 import useServerHiddenStore from './stores/serverHiddenStore'
+import useServerRatingStore from './stores/serverRatingStore'
 
 function App() {
   const { isLoading, error } = useInitializeData()
-  const loadServerData = useServerHiddenStore(state => state.loadFromServer)
+  const loadHiddenData = useServerHiddenStore(state => state.loadFromServer)
+  const loadRatingData = useServerRatingStore(state => state.loadFromServer)
 
   // Initialize server data on app start
   useEffect(() => {
-    loadServerData().catch(error => {
-      console.error('Failed to load server data:', error)
-      // App will fallback to localStorage data automatically
-    })
-  }, [loadServerData])
+    const loadAllServerData = async () => {
+      try {
+        await Promise.allSettled([
+          loadHiddenData(),
+          loadRatingData()
+        ])
+      } catch (error) {
+        console.error('Failed to load server data:', error)
+        // App will fallback to localStorage data automatically
+      }
+    }
+    
+    loadAllServerData()
+  }, [loadHiddenData, loadRatingData])
 
   if (isLoading) {
     return (
