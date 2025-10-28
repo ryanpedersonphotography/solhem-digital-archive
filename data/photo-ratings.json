@@ -1,12 +1,18 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-10-28T21:06:51.663Z",
+  "lastUpdated": "2025-10-28T21:06:53.561Z",
   "ratings": {
     "fred-2025-002": {
       "photoId": "fred-2025-002",
       "eventId": "fred-2025",
       "rating": 5,
       "timestamp": "2025-10-28T21:06:51.663Z"
+    },
+    "fred-2025-003": {
+      "photoId": "fred-2025-003",
+      "eventId": "fred-2025",
+      "rating": 5,
+      "timestamp": "2025-10-28T21:06:53.560Z"
     }
   }
 }
