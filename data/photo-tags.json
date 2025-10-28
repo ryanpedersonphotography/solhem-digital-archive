@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-10-28T21:58:09.354Z",
+  "lastUpdated": "2025-10-28T21:58:15.637Z",
   "photoTags": {
     "fred-2025-002": {
       "photoId": "fred-2025-002",
@@ -18,6 +18,14 @@
         "Kids"
       ],
       "timestamp": "2025-10-28T21:58:09.073Z"
+    },
+    "fred-2025-005": {
+      "photoId": "fred-2025-005",
+      "eventId": "fred-2025",
+      "tags": [
+        "Friends"
+      ],
+      "timestamp": "2025-10-28T21:58:15.298Z"
     }
   }
 }
