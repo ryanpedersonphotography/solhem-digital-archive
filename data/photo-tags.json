@@ -1,14 +1,15 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-10-28T21:58:01.488Z",
+  "lastUpdated": "2025-10-28T21:58:02.686Z",
   "photoTags": {
     "fred-2025-002": {
       "photoId": "fred-2025-002",
       "eventId": "fred-2025",
       "tags": [
-        "Friends"
+        "Friends",
+        "Portrait"
       ],
-      "timestamp": "2025-10-28T21:58:01.040Z"
+      "timestamp": "2025-10-28T21:58:02.433Z"
     }
   }
 }
