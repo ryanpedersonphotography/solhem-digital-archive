@@ -3,7 +3,7 @@ import JSZip from 'jszip';
 import type { PropertyEvent } from '../../types';
 import useRatingStore from '../../stores/ratingStore';
 import useTagStore from '../../stores/tagStore';
-import useHiddenStore from '../../stores/hiddenStore';
+import useHiddenStore from '../../stores/serverHiddenStore';
 import usePublicStore from '../../stores/publicStore';
 import useFlagStore from '../../stores/flagStore';
 import StarRating from './StarRating';

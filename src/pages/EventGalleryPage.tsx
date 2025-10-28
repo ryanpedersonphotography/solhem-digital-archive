@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { eventsData } from '../utils/eventData';
 import useRatingStore from '../stores/ratingStore';
 import useTagStore, { ALL_TAGS } from '../stores/tagStore';
-import useHiddenStore from '../stores/hiddenStore';
+import useHiddenStore from '../stores/serverHiddenStore';
 import usePublicStore from '../stores/publicStore';
 import StarRating from '../components/features/StarRating';
 import EventGallery from '../components/features/EventGallery';

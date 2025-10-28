@@ -1,5 +1,6 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
 import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import Properties from './pages/Properties'
@@ -11,9 +12,19 @@ import EventGalleryPage from './pages/EventGalleryPage'
 import PhotoGallery from './pages/PhotoGallery'
 import PublicGallery from './pages/PublicGallery'
 import { useInitializeData } from './hooks/useData'
+import useServerHiddenStore from './stores/serverHiddenStore'
 
 function App() {
   const { isLoading, error } = useInitializeData()
+  const loadServerData = useServerHiddenStore(state => state.loadFromServer)
+
+  // Initialize server data on app start
+  useEffect(() => {
+    loadServerData().catch(error => {
+      console.error('Failed to load server data:', error)
+      // App will fallback to localStorage data automatically
+    })
+  }, [loadServerData])
 
   if (isLoading) {
     return (
